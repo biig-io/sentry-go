@@ -10,7 +10,6 @@ require (
 	github.com/gin-gonic/gin v1.4.0
 	github.com/go-errors/errors v1.0.1
 	github.com/go-martini/martini v0.0.0-20170121215854-22fa46961aab
-	github.com/gofiber/fiber v1.14.6
 	github.com/gofiber/fiber/v2 v2.1.1
 	github.com/gofiber/utils v0.0.10
 	github.com/google/go-cmp v0.4.0

@@ -5,7 +5,7 @@ import (
 
 	"github.com/getsentry/sentry-go"
 	sentryfiber "github.com/getsentry/sentry-go/fiber"
-	"github.com/gofiber/fiber"
+	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/utils"
 )
 
@@ -32,22 +32,24 @@ func main() {
 		WaitForDelivery: true,
 	})
 
-	enhanceSentryEvent := func(ctx *fiber.Ctx) {
+	enhanceSentryEvent := func(ctx *fiber.Ctx) error {
 		if hub := sentryfiber.GetHubFromContext(ctx); hub != nil {
 			hub.Scope().SetTag("someRandomTag", "maybeYouNeedIt")
 		}
 		ctx.Next()
+		return nil
 	}
 
 	app := fiber.New()
 
 	app.Use(sentryHandler)
 
-	app.All("/foo", enhanceSentryEvent, func(ctx *fiber.Ctx) {
+	app.All("/foo", enhanceSentryEvent, func(ctx *fiber.Ctx) error {
 		panic("y tho")
+		return nil
 	})
 
-	app.All("/", func(ctx *fiber.Ctx) {
+	app.All("/", func(ctx *fiber.Ctx) error {
 		if hub := sentryfiber.GetHubFromContext(ctx); hub != nil {
 			hub.WithScope(func(scope *sentry.Scope) {
 				scope.SetExtra("unwantedQuery", "someQueryDataMaybe")
@@ -55,9 +57,10 @@ func main() {
 			})
 		}
 		ctx.Status(fiber.StatusOK)
+		return nil
 	})
 
-	if err := app.Listen(3000); err != nil {
+	if err := app.Listen(":3000"); err != nil {
 		panic(err)
 	}
 }
